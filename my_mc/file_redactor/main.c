@@ -16,7 +16,7 @@
 
 #include <assert.h>
 
-#define CNT_BYTE_READ 5
+#define CNT_BYTE_READ 20
 extern WINDOW *stdscr;
 
 void sig_winch(int signo)
@@ -24,6 +24,20 @@ void sig_winch(int signo)
     struct winsize size;
     ioctl(fileno(stdout), TIOCGWINSZ, (char *) &size);
     resizeterm(size.ws_row, size.ws_col);
+}
+
+void reverse(char* str)
+{
+    // получаем длину строки
+    int n = strlen(str);
+ 
+    // начинаем менять местами символы с обоих концов строки
+    for (int i = 0, j = n - 1; i < j; i++, j--)
+    {
+        char ch = str[i];
+        str[i] = str[j];
+        str[j] = ch;
+    }
 }
 
 void read_file(int file_descriptor, char *buf) {
@@ -36,33 +50,77 @@ void read_file(int file_descriptor, char *buf) {
     buf[res] = '\0';
 }
 
+void draw_file(int file_descriptor) {
+    while(1) {
+        char buf[256];
+        read_file(file_descriptor, buf);
+        
+        printw("%s", buf);
+        if (buf[0] == '\0') break;
+    }
+
+}
+
+void save_file(FILE *fp) {
+
+    int max_y = 0, max_x = 0;
+    getmaxyx(stdscr, max_y, max_x);
+    // fprintf(fp, "max_y: %d\nmax_x: %d\n",  max_y, max_x);
+    
+    for (int i = 0; i <= max_y; i++) {
+        char buf[1024];
+        buf[0] = '\0'; // строка будет идти в обратном порядке
+        int counter_LF = 0, index = 0; // счетчик, означает, что нужно поставить \n
+
+        for (int j = max_x; j >= 0; j--) {
+            char tmp_ch = mvinch(i, j);
+
+            if (tmp_ch == ' ' && 0 == counter_LF) {
+                continue;
+            } else if (tmp_ch >= 32 && tmp_ch < 127) {
+                counter_LF = 1;
+                buf[index++] = tmp_ch;
+            }
+
+
+        }
+        if (counter_LF == 0) {
+            // buf[index++] = '\n'; 
+            fprintf(fp, "\n");
+        } else {
+            buf[index] = '\0';
+            reverse(buf);
+            if (strlen(buf) > 0) {
+                // fprintf(fp, "|");
+                fprintf(fp, "%s\n", buf);
+
+            }
+
+        }
+
+    }
+
+}
+
 int main(int argc, char ** argv) {
+    FILE *fp = fopen("OUTPUT.txt", "w");
     initscr();
     
     signal(SIGWINCH, sig_winch);
     cbreak(); 
     noecho();
     curs_set(TRUE);
-
+    // idlok(stdscr, TRUE);
+    // scrollok(stdscr, TRUE);
+    // scroll(stdscr);
+    
     attron(A_BOLD);
-    // move(5, 15);
     int file_descriptor = open("file2.txt", O_CREAT|O_RDWR, S_IRWXU);
-    FILE* fp;
-    while(1) {
-        char buf[256];
-        read_file(file_descriptor, buf);
-        printw("%s", buf);
-        if (buf[0] == '\0') break;
-    }
-
-
-    // printw("Hello, brave new curses world!\n");
+    
+    draw_file(file_descriptor);
 
 
     attroff(A_BOLD);
-    // attron(A_BLINK);
-    // move(7, 16);
-    // printw("Press any key to continue...");
     refresh();
 
     keypad(stdscr, TRUE); // Для обработки esc спец символов
@@ -73,39 +131,38 @@ int main(int argc, char ** argv) {
     while( (ch = wgetch(stdscr)) != KEY_F(3)) {
         getyx(stdscr, y, x);
 
-        if (ch == KEY_BACKSPACE) {
-            delch();
-            // обработать \n
-        } else if (ch == KEY_LEFT) {
-            wmove(stdscr, y, x - 1);
-        } else if (ch == KEY_RIGHT) {
-            wmove(stdscr, y, x + 1);
-        } else if (ch == KEY_UP) {
-            wmove(stdscr, y - 1, x);
-        } else if (ch == KEY_DOWN) {
-            wmove(stdscr, y + 1, x);
-        } else if (ch == KEY_F(1)) {
-            fp = fopen("file2.txt", "rw");
-            assert(fp != NULL);
-            putwin(stdscr, fp);
-        } 
-        
-        else {
-            wechochar(stdscr, ch);
-        }
+        switch (ch) {
+        case KEY_BACKSPACE:
+            break;
 
-        // switch (ch)
-        // {
-        // case KEY_BACKSPACE:
-            
-        //     break;
-        
-        // default:
-        //     break;
-        // }
+        case KEY_LEFT:
+            wmove(stdscr, y, x - 1);
+            break;
+
+        case KEY_RIGHT:
+            wmove(stdscr, y, x + 1);
+            break;
+
+        case KEY_UP:
+            wmove(stdscr, y - 1, x);
+            break;
+
+        case KEY_DOWN:
+            wmove(stdscr, y + 1, x);
+            break;
+
+        case KEY_F(1):
+            save_file(fp);
+            break;
+
+
+        default:
+            wechochar(stdscr, ch);
+            break;
+        }
     }
     close(file_descriptor);
-    if(fp != NULL)    fclose(fp);
+    fclose(fp);
 
     endwin();
     exit(EXIT_SUCCESS);

@@ -25,7 +25,7 @@ void read_file(int file_descriptor, char *buf) {
 
     strncpy(buf, buffer_for_read, res);
     buf[res] = '\0';
-        
+
 
 }
 
@@ -45,9 +45,6 @@ int main() {
 
     return 0;
 }
-
-
-
 
 
 
