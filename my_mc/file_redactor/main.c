@@ -103,24 +103,30 @@ void save_file(FILE *fp, int file_descriptor) {
                 write(file_descriptor, buf, strlen(buf));
 
             }
-
         }
-
     }
-
 }
 
+
+
+
+
+
 void print_menu(WINDOW *MENU_WIND, WINDOW *MENU_BORDER) {
-
-
 
     box(MENU_BORDER, '|', '-');
     wprintw(MENU_WIND, "F(1): save file, F(2): open/create file, F(3): exit\n");
     wrefresh(MENU_BORDER);
 
-    
-
 }
+
+void input_filename_on_window(WINDOW *INPUT_FILE) {
+    wprintw(INPUT_FILE, "Enter(F4) filename for open/create file: ");
+
+    wrefresh(INPUT_FILE);
+}
+
+
 
 int print_file(char *filename) {
 
@@ -145,12 +151,11 @@ int write_scr(FILE *fp, int file_descriptor, WINDOW *MENU_WIND, WINDOW *MENU_BOR
     int flag_break = 0;
     wmove(stdscr, y, x);
     while( (ch = wgetch(stdscr)) != KEY_F(3)) {
-        getyx(stdscr, y, x);
-        
+        getyx(stdscr, y, x);        
 
         switch (ch) {
         case KEY_BACKSPACE:
-            delch();
+            wdelch(stdscr);
             // обработать \n, а точнее удаление строки
             break;
 
@@ -182,7 +187,7 @@ int write_scr(FILE *fp, int file_descriptor, WINDOW *MENU_WIND, WINDOW *MENU_BOR
         case KEY_F(3):
             flag_break = 1;
             break;
-
+        // case ENTER - обработать бы перенос строки
         default:
             wechochar(stdscr, ch);
             break;
@@ -192,22 +197,63 @@ int write_scr(FILE *fp, int file_descriptor, WINDOW *MENU_WIND, WINDOW *MENU_BOR
     }
 
     close(file_descriptor);
-    fclose(fp);
 
     return status;
 }
 
-void main_fucntions(char *filename, FILE *fp, WINDOW *MENU_WIND, WINDOW *MENU_BORDER) {
+int write_scr_input_file(WINDOW *INPUT_FILE, char *filename) {
+    
+    int status = 0;    
+    int ch;
+    int y = 0, x = 41;
+    int flag_break = 0;
+    unsigned int index = 0;
+    wmove(INPUT_FILE, y, x);
+    while(1) {
 
-    int file_descriptor = print_file(filename);
-    print_menu(MENU_WIND, MENU_BORDER);
+        ch = wgetch(INPUT_FILE);
+        getyx(INPUT_FILE, y, x);        
 
-    write_scr(fp, file_descriptor, MENU_WIND, MENU_BORDER);
+        switch (ch) {
+        case KEY_BACKSPACE:
+            wdelch(INPUT_FILE);
+            // обработать \n, а точнее удаление строки
+            // !!! for filename need to do !!!
+            break;
+
+        case KEY_LEFT:
+            wmove(INPUT_FILE, y, x - 1);
+            if (index > 0) index--;
+            break;
+
+        case KEY_RIGHT:
+            wmove(INPUT_FILE, y, x + 1);
+            index++;
+            break;
+
+        case KEY_F(3):
+            flag_break = 1;
+            break;
+        
+        case KEY_F(4): // KEY_ENTER :(
+            flag_break = 1;
+            status = 1;
+            break;
+        default:
+            wechochar(INPUT_FILE, ch);
+            filename[index++] = ch;
+            break;
+        }
+
+        if (flag_break) break;
+    }
+
+    return status;
 }
 
 int main(int argc, char ** argv) {
 
-    WINDOW *MENU_WIND, *MENU_BORDER;
+    WINDOW *MENU_WIND, *MENU_BORDER, *INPUT_FILE;
     FILE *fp = fopen("OUTPUT.txt", "w"); // для отладки
     initscr();
     
@@ -224,24 +270,48 @@ int main(int argc, char ** argv) {
     getmaxyx(stdscr, max_y, max_x);
 
     MENU_BORDER = newwin(4, max_x, max_y - 4, 0);
-    MENU_WIND = derwin(MENU_BORDER, 2, max_x - 2, 1, 1);
+    MENU_WIND = derwin(MENU_BORDER, 1, max_x - 2, 1, 1);
+    INPUT_FILE = derwin(MENU_BORDER, 1, max_x - 2, 2, 1);
+
+    keypad(INPUT_FILE, TRUE);
+
+    char filename[256] = "temp.out";
+    // можно сразу начинать с открытия файла, н-р, через аргументы
 
     while(1) {
-        // main_fucntions("file3.txt", fp, MENU_WIND, MENU_BORDER);
-        int file_descriptor = print_file("temp.out");
+        int status_input = -1;
+        int file_descriptor = print_file(filename);
         print_menu(MENU_WIND, MENU_BORDER);
 
         int status = write_scr(fp, file_descriptor, MENU_WIND, MENU_BORDER);
         
-        if (0 == status) break;
+        if (0 == status) {
+            break;
+        } else if (1 == status) {
+            input_filename_on_window(INPUT_FILE);
+            status_input = write_scr_input_file(INPUT_FILE, filename);
+        }
+        wclear(MENU_WIND);
+        wclear(INPUT_FILE);
+        werase(stdscr); 
+        //  werase не удаляет стр, а заполняет пробелами
+        // Проблема, 
+
+        if (0 == status_input) break;
+
     }
 
 
     delwin(MENU_WIND);
     delwin(MENU_BORDER);
+    delwin(INPUT_FILE);
 
+
+    fclose(fp);
+    
     endwin();
     exit(EXIT_SUCCESS);
+    
     return 0;
 }
 
