@@ -59,7 +59,6 @@ void draw_file(int file_descriptor) {
         printw("%s", buf);
         if (buf[0] == '\0') break;
     }
-
 }
 
 void save_file(FILE *fp, int file_descriptor) {

@@ -86,7 +86,7 @@ int main() {
 
 
 
-    // ssize_t rv = write(file_descriptor, buffer, size);
+    ssize_t rv = write(file_descriptor, buffer, size);
     // write(file_descriptor, buffer2, size);
 
     // printf("error_: %d\n", errno);
