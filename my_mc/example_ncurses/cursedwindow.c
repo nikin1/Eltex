@@ -17,6 +17,7 @@ void sig_winch(int signo)
 int main(int argc, char ** argv) {
     WINDOW * wnd;
     WINDOW * subwnd;
+    
     initscr();
     signal(SIGWINCH, sig_winch);
     cbreak();
@@ -24,10 +25,10 @@ int main(int argc, char ** argv) {
     refresh();
     wnd = newwin(6, 18, 2, 4);
     box(wnd, '|', '-');
-    subwnd = derwin(wnd, 4, 16, 1, 1);
-    wprintw(subwnd, "Hello, brave new curses world!\n");
+    // subwnd = derwin(wnd, 4, 16, 1, 1);
+    // wprintw(subwnd, "Hello, brave new curses world!\n");
     wrefresh(wnd);
-    delwin(subwnd);
+    // delwin(subwnd);
     delwin(wnd);
     move(9, 0);
     printw("Press any key to continue...");

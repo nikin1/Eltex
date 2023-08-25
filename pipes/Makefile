@@ -26,3 +26,5 @@ test2: $(PROGRAM2)
 clean:
 	rm -f $(PROGRAM1) $(PROGRAM2)
 	rm -f myfifo
+
+
