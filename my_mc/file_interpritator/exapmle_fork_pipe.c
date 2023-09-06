@@ -11,12 +11,6 @@ int main(int argc, char *argv[])
     pid_t cpid;
     char buf;
 
-    // NEED ./a.out Hello world!
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <string>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-
     if (pipe(pipefd) == -1) {
         perror("pipe");
         exit(EXIT_FAILURE);
@@ -40,13 +34,13 @@ int main(int argc, char *argv[])
         while (read(pipefd[0], &buf, 1) > 0)
             write(STDOUT_FILENO, &buf, 1);     /*printf*/
 
-        write(STDOUT_FILENO, "\t", 1);
+        write(STDOUT_FILENO, "\n\n\n", 1);
         close(pipefd[0]);
 
 
         // pipe2
         close(second_pipefd[0]);
-        write(second_pipefd[1], argv[2], strlen(argv[2]));
+        write(second_pipefd[1], "WORLD!", strlen("WORLD!"));
         close(second_pipefd[1]);          /* Reader will see EOF */
 
 
@@ -56,8 +50,22 @@ int main(int argc, char *argv[])
         
         // pipe 1
         close(pipefd[0]);          /* Close unused read end */
-        write(pipefd[1], argv[1], strlen(argv[1]));
+        // write(pipefd[1], argv[1], strlen(argv[1]));
+
+        printf("<<<\n");
+        if (dup2(pipefd[1], 1) == -1){
+            write(pipefd[1], "ERRNO\n", strlen("ERRNO\n"));
+        } else {
+            write(pipefd[1], "NO_ERRNO\n", strlen("NO_ERRNO\n"));
+
+        }
         close(pipefd[1]);          /* Reader will see EOF */
+        // system("ls -a");
+        printf(">>>");
+
+        write(pipefd[1], "argv[1]", strlen("argv[1]"));
+
+
  
  
 
