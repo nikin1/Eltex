@@ -1,5 +1,7 @@
 #include "chat.h"
 
+extern WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
+*WIN_DOWN_BORDER, *WIN_DOWN;
 
 int main(int argc, char *argv[]) {
 
@@ -11,19 +13,21 @@ int main(int argc, char *argv[]) {
 
     if (qid == -1) errExit("msgget");
 
-    char name[80];
+    char name[80], c;
     printf("What is your name ? ");
-    scanf("%s", name);
+    scanf("%s%c", name, &c);
 
     send_msg(qid, SERVICE_PRIORITY, name, my_pid);
 
+
     while(1) {
-        char message[80];
-        printf("%s: ", name);
-        scanf("%s", message);
+        char str_message[80], c, tmp[80];
 
-        send_msg(qid, MESSAGE_PRIORITY, message, my_pid);
+        // printf("%s: ", name);
+        fgets(str_message, sizeof(str_message), stdin);
+        str_message[strlen(str_message) - 1] = '\0';
 
+        send_msg(qid, MESSAGE_PRIORITY, str_message, my_pid);
     }
 
 

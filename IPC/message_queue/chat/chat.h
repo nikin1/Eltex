@@ -29,7 +29,8 @@
 #define SERVICE_PRIORITY 1
 #define MESSAGE_PRIORITY 2
 
-
+extern WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
+*WIN_DOWN_BORDER, *WIN_DOWN;
 
 
 struct msgbuf {
@@ -60,6 +61,7 @@ int check_set(int *set, int index, int x);
 int Len_List(list_t *H);
 int Check_Polindrom(list_t *H);
 list_t *Search_Element(list_t *H, int k);
+list_t *Search_Element_on_PID(list_t *H, int pid);
 void DelDuplic(list_t *head);
 list_t *Remove(list_t *A, list_t *head);
 list_t *Append(list_t *A, int pid, char *str);
@@ -69,9 +71,11 @@ void Copy_Data_out_MSG_BUF(list_t *dest, struct msgbuf source);
 
 
 // display
-extern int GLOBAL_LIST_LEN;
+// extern int GLOBAL_LIST_LEN;
 
-void display_right(WINDOW* WIN_DOWN_BORDER, list_t* names_list);
+void display_right(WINDOW* WIN_RIGHT_BORDER, list_t* header_list);
 void end_display(WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER, WINDOW* WIN_DOWN_BORDER);
 int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
+    WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN);
+int refresh_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
     WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN);

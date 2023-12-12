@@ -11,7 +11,7 @@ list_t *Create(int pid, char *str) {
 
     
 
-    GLOBAL_LIST_LEN = 1;
+    // GLOBAL_LIST_LEN = 1;
     return HEAD;
 }
 
@@ -26,7 +26,7 @@ list_t *Append(list_t *A, int pid, char *str) {
     strcpy(element->name, str);
     element->next = tmp; // добавляем узел из ------------------------------
 
-    GLOBAL_LIST_LEN += 1;
+    // GLOBAL_LIST_LEN += 1;
     return element;
 }
 
@@ -38,7 +38,7 @@ list_t *Remove(list_t *A, list_t *head) {
     }   
     tmp->next = A->next;
     free(A);
-    GLOBAL_LIST_LEN -= 1;
+    // GLOBAL_LIST_LEN -= 1;
 
     return tmp;
 }
@@ -100,6 +100,19 @@ list_t *Search_Element(list_t *H, int k) {
     list_t *a = NULL;
     a = H;
     for (int i = 0; i < len - k; i++) {
+        a = GetTail(a);
+    }
+    return a;
+}
+
+list_t *Search_Element_on_PID(list_t *H, int pid) {
+    int len = Len_List(H);
+    list_t *a = NULL;
+    a = H;
+    for (int i = 0; i < len; i++) {
+        if (a->pid == pid) {
+            break;
+        }
         a = GetTail(a);
     }
     return a;

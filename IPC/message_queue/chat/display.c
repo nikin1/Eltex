@@ -13,13 +13,16 @@ void sig_winch(int signo)
 
 
 
-void display_right(WINDOW* WIN_DOWN_BORDER, list_t* names_list) {
-    wmove(WIN_DOWN_BORDER, 1, 0);
+void display_right(WINDOW* WIN_RIGHT_BORDER, list_t* header_list) {
+    wmove(WIN_RIGHT_BORDER, 1, 0);
+    int len_name_list = Len_List(header_list);
+    list_t* names_list = header_list;
 
-    for (int i = 0; i < GLOBAL_LIST_LEN; i++) {
-        wprintw(WIN_DOWN_BORDER, "%s\n", names_list->name);        
+    for (int i = 0; i < len_name_list; i++) {
+        wprintw(WIN_RIGHT_BORDER, "%s\n", names_list->name);
+        names_list = names_list->next;        
     }
-    wrefresh(WIN_DOWN_BORDER);
+    wrefresh(WIN_RIGHT_BORDER);
 }
 
 
@@ -89,6 +92,30 @@ int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, W
     wmove(WIN_DOWN, 1, strlen("Enter message: \n"));
     
 
+    wrefresh(WIN_RIGHT_BORDER);
+    wrefresh(WIN_LEFT_BORDER);
+    wrefresh(WIN_DOWN_BORDER);
+
+
+    wrefresh(WIN_LEFT);
+    wrefresh(WIN_DOWN);
+    wrefresh(WIN_RIGHT);
+
+
+    int cnt = 0;
+    while (1)
+    {
+        cnt++;
+    }
+
+
+
+    return 0;
+}
+
+
+int refresh_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
+    WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN) {
     
 
     wrefresh(WIN_RIGHT_BORDER);
@@ -101,33 +128,16 @@ int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, W
     wrefresh(WIN_RIGHT);
 
 
-
-
-
-
-
-
-
-    // work = while(1)
-
-    // wmove(WIN_RIGHT, 0, 0);
-    // wmove(WIN_LEFT, 0, 0);
-
-
-    // wmove(WIN_DOWN, 0, 0);
-    // wrefresh(WIN_DOWN);
-
     int cnt = 0;
     while (1)
     {
         cnt++;
     }
-    
 
 
-
-    return 0;
 }
+
+
 
 void end_display(WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER, WINDOW* WIN_DOWN_BORDER) {
 

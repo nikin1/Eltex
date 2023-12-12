@@ -13,6 +13,7 @@ void send_msg(int qid, int msgtype, char *str_to_msg, long msg_pid) {
     msg.mpid = msg_pid; //test
 
     // time(&t);
+    printf("pre_sent: %s\n", str_to_msg);
     snprintf(msg.mtext, sizeof(msg.mtext), "%s", str_to_msg);
 
     if (msgsnd(qid, &msg, sizeof(msg.mtext),
