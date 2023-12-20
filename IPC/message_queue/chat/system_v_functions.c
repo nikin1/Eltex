@@ -7,13 +7,13 @@ void errExit(char *str) {
 }
 
 void send_msg(int qid, int msgtype, char *str_to_msg, long msg_pid) {
-    struct msgbuf msg;
+    struct my_msgbuf msg;
 
     msg.mtype = msgtype;
     msg.mpid = msg_pid; //test
 
     // time(&t);
-    printf("pre_sent: %s\n", str_to_msg);
+    // printf("pre_sent: %s\n", str_to_msg);
     snprintf(msg.mtext, sizeof(msg.mtext), "%s", str_to_msg);
 
     if (msgsnd(qid, &msg, sizeof(msg.mtext),
@@ -21,25 +21,31 @@ void send_msg(int qid, int msgtype, char *str_to_msg, long msg_pid) {
         perror("msgsnd error");
         exit(EXIT_FAILURE);
     }
-    printf("sent: %s\n", msg.mtext);
+    // printf("sent: %s\n", msg.mtext);
 }
 
 
-int get_msg(int qid, int msgtype, struct msgbuf* msg) {
+int get_msg(int qid, int msgtype, struct my_msgbuf* msg, int var_nowait) {
 
-    if (msgrcv(qid, msg, sizeof(msg->mtext), msgtype,
-                MSG_NOERROR) == -1) {
+    int res;
+    if (var_nowait) {
+        res = msgrcv(qid, msg, sizeof(msg->mtext), msgtype, MSG_NOERROR | IPC_NOWAIT);
+    } else {
+        res = msgrcv(qid, msg, sizeof(msg->mtext), msgtype, MSG_NOERROR);        
+    }
+
+    if (res == -1) {
         // if (errno != ENOMSG) {
             // perror("msgrcv");
             // exit(EXIT_FAILURE);
         // }
         // printf("No message available for msgrcv()\n");
-        printf("Message have a Mistake\n");
+        // printf("Message have a Mistake\n");
         return -1;
     } else {
-        printf("message received: %s\n", msg->mtext);
+        // printf("message received: %s\n", msg->mtext);
         return 1;
-
     }
+
 }
 

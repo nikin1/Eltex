@@ -1,6 +1,11 @@
 #include "chat.h"
 
 // extern int GLOBAL_LIST_LEN;
+WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
+*WIN_DOWN_BORDER, *WIN_DOWN, *WIN_INPUT;
+
+
+
 
 // function for ncurses
 void sig_winch(int signo)
@@ -13,31 +18,31 @@ void sig_winch(int signo)
 
 
 
-void display_right(WINDOW* WIN_RIGHT_BORDER, list_t* header_list) {
-    wmove(WIN_RIGHT_BORDER, 1, 0);
+void display_right(WINDOW* WIN_RIGHT, list_t* header_list, int pid) {
+    wmove(WIN_RIGHT, 1, 0);
     int len_name_list = Len_List(header_list);
     list_t* names_list = header_list;
-
+    // printf("<<>>\n");
+    // printf("_name: %s\n", names_list->name);
     for (int i = 0; i < len_name_list; i++) {
-        wprintw(WIN_RIGHT_BORDER, "%s\n", names_list->name);
+        wprintw(WIN_RIGHT, "%s(pid:%d)\n", names_list->name, names_list->pid);
         names_list = names_list->next;        
     }
-    wrefresh(WIN_RIGHT_BORDER);
+    wrefresh(WIN_RIGHT);
 }
 
 
 
 
-void display(WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
- WINDOW*WIN_DOWN_BORDER, list_t* names_list) {
 
+
+void display_left(WINDOW* WIN_LEFT, list_t* name_list, char *str_message) {
+    // 
+    wprintw(WIN_LEFT, "%s: %s\n", name_list->name, str_message);
+    wrefresh(WIN_LEFT);
 }
 
-
-int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
-    WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN) {
-    // WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
-    // *WIN_DOWN_BORDER, *WIN_DOWN;
+void init_for_ncurses() {
 
     initscr();
 
@@ -50,6 +55,11 @@ int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, W
    
     keypad(stdscr, TRUE); // Для обработки esc спец символов
 
+}
+
+int init_display() {
+    // WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
+    // *WIN_DOWN_BORDER, *WIN_DOWN;
 
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
@@ -72,10 +82,15 @@ int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, W
     WIN_LEFT = derwin(WIN_LEFT_BORDER, max_y - down_width - 2, max_x * 3 / 4 - 2, 1, 1);
     WIN_RIGHT = derwin(WIN_RIGHT_BORDER, max_y - down_width - 2, max_x / 4 - 2, 1, 1);
     WIN_DOWN = derwin(WIN_DOWN_BORDER, down_width - 2, max_x - 2, 1, 1);
+    
+    int x_for_input = max_x - 2 - strlen("Enter message:"); 
+    WIN_INPUT = derwin(WIN_DOWN_BORDER, 1,  x_for_input, 2, strlen("Enter message:") + 1);
 
     keypad(WIN_LEFT, TRUE);
     keypad(WIN_RIGHT, TRUE);
     keypad(WIN_DOWN, TRUE);
+    keypad(WIN_INPUT, TRUE);
+
 
   
 
@@ -86,36 +101,26 @@ int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, W
 
 
     wprintw(WIN_RIGHT, "Members: \n");
-    wprintw(WIN_DOWN, "Enter F_10 for exit\n");
+    wprintw(WIN_DOWN, "Enter F_10 for exit and F_9 for enter message\n");
     wprintw(WIN_DOWN, "Enter message: \n");
     wprintw(WIN_DOWN, "(max 50 simbol)");
     wmove(WIN_DOWN, 1, strlen("Enter message: \n"));
     
 
-    wrefresh(WIN_RIGHT_BORDER);
-    wrefresh(WIN_LEFT_BORDER);
-    wrefresh(WIN_DOWN_BORDER);
+    // wrefresh(WIN_RIGHT_BORDER);
+    // wrefresh(WIN_LEFT_BORDER);
+    // wrefresh(WIN_DOWN_BORDER);
 
 
-    wrefresh(WIN_LEFT);
-    wrefresh(WIN_DOWN);
-    wrefresh(WIN_RIGHT);
-
-
-    int cnt = 0;
-    while (1)
-    {
-        cnt++;
-    }
-
-
+    // wrefresh(WIN_LEFT);
+    // wrefresh(WIN_DOWN);
+    // wrefresh(WIN_RIGHT);
 
     return 0;
 }
 
 
-int refresh_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
-    WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN) {
+int refresh_display() {
     
 
     wrefresh(WIN_RIGHT_BORDER);
@@ -126,15 +131,63 @@ int refresh_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER
     wrefresh(WIN_LEFT);
     wrefresh(WIN_DOWN);
     wrefresh(WIN_RIGHT);
+    wrefresh(WIN_INPUT);
+
+}
 
 
-    int cnt = 0;
-    while (1)
-    {
-        cnt++;
+
+int INPUT_MESSAGE(char *str_message) {
+
+    // WINDOW *WIN_INPUT; 
+    // char str_message[80];
+    
+    int status = 0;
+    int ch;
+    int y = 0, x = 0;
+    int flag_break = 0;
+    unsigned int index = 0;
+    wmove(WIN_INPUT, y, x);
+    while(1) {
+
+        ch = wgetch(WIN_INPUT);
+        getyx(WIN_INPUT, y, x);        
+
+        switch (ch) {
+        case KEY_BACKSPACE:
+            wdelch(WIN_INPUT);
+            // обработать \n, а точнее удаление строки
+            // !!! for str_message need to do !!!
+            break;
+
+        case KEY_LEFT:
+            wmove(WIN_INPUT, y, x - 1);
+            if (index > 0) index--;
+            break;
+
+        case KEY_RIGHT:
+            wmove(WIN_INPUT, y, x + 1);
+            index++;
+            break;
+
+        case KEY_F(10):
+            flag_break = 1;
+            break;
+        
+        case KEY_F(9): // KEY_ENTER :(
+            flag_break = 1;
+            status = 1;
+            break;
+        default:
+            wechochar(WIN_INPUT, ch);
+            str_message[index++] = ch;
+            break;
+        }
+
+        if (flag_break) break;
     }
 
-
+    return status;
 }
 
 

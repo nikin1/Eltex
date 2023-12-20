@@ -26,21 +26,21 @@
 
 #define PMODE 0666
 
-#define SERVICE_PRIORITY 1
-#define MESSAGE_PRIORITY 2
+#define SERVICE_PRIORITY 10
+#define MESSAGE_PRIORITY 5
 
 extern WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
 *WIN_DOWN_BORDER, *WIN_DOWN;
 
 
-struct msgbuf {
+struct my_msgbuf {
     long mtype;
     char mtext[80];
     long mpid;  // I need to add for my case
     // mpid - это я добавил для того, чтобы клиент отправлял свой pid
 };
 
-int get_msg(int qid, int msgtype, struct msgbuf *msg);
+int get_msg(int qid, int msgtype, struct my_msgbuf* msg, int var_nowait);
 void errExit(char *str);
 void send_msg(int qid, int msgtype, char *str_to_msg, long msg_pid);
 
@@ -66,16 +66,18 @@ void DelDuplic(list_t *head);
 list_t *Remove(list_t *A, list_t *head);
 list_t *Append(list_t *A, int pid, char *str);
 list_t *Create(int pid, char *str);
-void Copy_Data_out_MSG_BUF(list_t *dest, struct msgbuf source);
+void Copy_Data_out_MSG_BUF(list_t *dest, struct my_msgbuf source);
 
 
 
 // display
 // extern int GLOBAL_LIST_LEN;
 
-void display_right(WINDOW* WIN_RIGHT_BORDER, list_t* header_list);
+void display_right(WINDOW* WIN_RIGHT, list_t* header_list, int pid);
+void display_left(WINDOW* WIN_LEFT, list_t* name_list, char *str_message);
 void end_display(WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER, WINDOW* WIN_DOWN_BORDER);
-int init_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
-    WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN);
-int refresh_display(WINDOW* WIN_LEFT, WINDOW* WIN_RIGHT, WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER,
-    WINDOW* WIN_DOWN_BORDER, WINDOW* WIN_DOWN);
+void init_for_ncurses();
+int init_display();
+int refresh_display();
+void sig_winch(int signo);
+int INPUT_MESSAGE();

@@ -115,10 +115,11 @@ list_t *Search_Element_on_PID(list_t *H, int pid) {
         }
         a = GetTail(a);
     }
+    // printf("a: %s", a->name);
     return a;
 }
 
-void Copy_Data_out_MSG_BUF(list_t *dest, struct msgbuf source) {
+void Copy_Data_out_MSG_BUF(list_t *dest, struct my_msgbuf source) {
     if (dest != NULL ) {
         dest->pid = source.mpid;
         strcpy(dest->name, source.mtext);
