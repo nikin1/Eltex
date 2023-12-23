@@ -40,17 +40,19 @@ struct my_msgbuf {
     // mpid - это я добавил для того, чтобы клиент отправлял свой pid
 };
 
-int get_msg(int qid, int msgtype, struct my_msgbuf* msg, int var_nowait);
-void errExit(char *str);
-void send_msg(int qid, int msgtype, char *str_to_msg, long msg_pid);
-
-
 typedef struct list {
    	int value;
     int pid;
-    char name[80];
+    char name[10];
     struct list *next;
 } list_t;
+
+
+int get_msg(int qid, int msgtype, struct my_msgbuf* msg, int var_nowait);
+void errExit(char *str);
+void send_msg(int qid, int msgtype, char *str_to_msg);
+void send_msg_all_users(int qid, list_t *head_name_list, char *str_to_msg);
+
 
 
 
@@ -74,10 +76,11 @@ void Copy_Data_out_MSG_BUF(list_t *dest, struct my_msgbuf source);
 // extern int GLOBAL_LIST_LEN;
 
 void display_right(WINDOW* WIN_RIGHT, list_t* header_list, int pid);
-void display_left(WINDOW* WIN_LEFT, list_t* name_list, char *str_message);
+void display_right_for_client(WINDOW* WIN_RIGHT, char* name, int pid);
+void display_left(WINDOW* WIN_LEFT, char* name, char *str_message);
 void end_display(WINDOW* WIN_LEFT_BORDER, WINDOW* WIN_RIGHT_BORDER, WINDOW* WIN_DOWN_BORDER);
 void init_for_ncurses();
 int init_display();
 int refresh_display();
 void sig_winch(int signo);
-int INPUT_MESSAGE();
+int input_message_on_display();

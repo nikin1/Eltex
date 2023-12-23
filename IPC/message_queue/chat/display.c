@@ -32,13 +32,21 @@ void display_right(WINDOW* WIN_RIGHT, list_t* header_list, int pid) {
 }
 
 
+void display_right_for_client(WINDOW* WIN_RIGHT, char* name, int pid) {
+    // wmove(WIN_RIGHT, 1, 0);
+    // printf("_name: %s\n", names_list->name);
+    wprintw(WIN_RIGHT, "%s(pid:%d)\n", name, pid);
+    wrefresh(WIN_RIGHT);
+}
 
 
 
 
-void display_left(WINDOW* WIN_LEFT, list_t* name_list, char *str_message) {
+
+
+void display_left(WINDOW* WIN_LEFT, char* name, char *str_message) {
     // 
-    wprintw(WIN_LEFT, "%s: %s\n", name_list->name, str_message);
+    wprintw(WIN_LEFT, "%s: %s\n", name, str_message);
     wrefresh(WIN_LEFT);
 }
 
@@ -101,7 +109,7 @@ int init_display() {
 
 
     wprintw(WIN_RIGHT, "Members: \n");
-    wprintw(WIN_DOWN, "Enter F_10 for exit and F_9 for enter message\n");
+    wprintw(WIN_DOWN, "Enter F_7 for exit and F_8 for updateand F_9 for enter message\n");
     wprintw(WIN_DOWN, "Enter message: \n");
     wprintw(WIN_DOWN, "(max 50 simbol)");
     wmove(WIN_DOWN, 1, strlen("Enter message: \n"));
@@ -137,7 +145,7 @@ int refresh_display() {
 
 
 
-int INPUT_MESSAGE(char *str_message) {
+int input_message_on_display(char *str_message) {
 
     // WINDOW *WIN_INPUT; 
     // char str_message[80];
@@ -170,7 +178,7 @@ int INPUT_MESSAGE(char *str_message) {
             index++;
             break;
 
-        case KEY_F(10):
+        case KEY_F(8):
             flag_break = 1;
             break;
         
@@ -186,6 +194,7 @@ int INPUT_MESSAGE(char *str_message) {
 
         if (flag_break) break;
     }
+    str_message[index] = '\0';
 
     return status;
 }
