@@ -1,10 +1,7 @@
 #include "chat.h"
 
-// extern int GLOBAL_LIST_LEN;
 WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
 *WIN_DOWN_BORDER, *WIN_DOWN, *WIN_INPUT;
-
-
 
 
 // function for ncurses
@@ -22,8 +19,6 @@ void display_right(WINDOW* WIN_RIGHT, list_t* header_list, int pid) {
     wmove(WIN_RIGHT, 1, 0);
     int len_name_list = Len_List(header_list);
     list_t* names_list = header_list;
-    // printf("<<>>\n");
-    // printf("_name: %s\n", names_list->name);
     for (int i = 0; i < len_name_list; i++) {
         wprintw(WIN_RIGHT, "%s(pid:%d)\n", names_list->name, names_list->pid);
         names_list = names_list->next;        
@@ -33,8 +28,6 @@ void display_right(WINDOW* WIN_RIGHT, list_t* header_list, int pid) {
 
 
 void display_right_for_client(WINDOW* WIN_RIGHT, char* name, int pid) {
-    // wmove(WIN_RIGHT, 1, 0);
-    // printf("_name: %s\n", names_list->name);
     wprintw(WIN_RIGHT, "%s(pid:%d)\n", name, pid);
     wrefresh(WIN_RIGHT);
 }
@@ -100,12 +93,6 @@ int init_display() {
     keypad(WIN_INPUT, TRUE);
 
 
-  
-
-
-    // DRAW - first
-    // draw_dirs(WIN_LEFT, namelist_win_left, cnt_dirs_left);
-    // draw_dirs(WIN_RIGHT, namelist_win_right, cnt_dirs_right);
 
 
     wprintw(WIN_RIGHT, "Members: \n");
@@ -114,16 +101,6 @@ int init_display() {
     wprintw(WIN_DOWN, "(max 50 simbol)");
     wmove(WIN_DOWN, 1, strlen("Enter message: \n"));
     
-
-    // wrefresh(WIN_RIGHT_BORDER);
-    // wrefresh(WIN_LEFT_BORDER);
-    // wrefresh(WIN_DOWN_BORDER);
-
-
-    // wrefresh(WIN_LEFT);
-    // wrefresh(WIN_DOWN);
-    // wrefresh(WIN_RIGHT);
-
     return 0;
 }
 
@@ -146,9 +123,6 @@ int refresh_display() {
 
 
 int input_message_on_display(char *str_message) {
-
-    // WINDOW *WIN_INPUT; 
-    // char str_message[80];
     
     int status = 0;
     int ch;

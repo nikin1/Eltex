@@ -1,6 +1,5 @@
 #include "chat.h"
 
-// extern int GLOBAL_LIST_LEN;
 
 list_t *Create(int pid, char *str) {
     list_t *HEAD;
@@ -9,9 +8,6 @@ list_t *Create(int pid, char *str) {
     strcpy(HEAD->name, str);
     HEAD->pid = pid;
 
-    
-
-    // GLOBAL_LIST_LEN = 1;
     return HEAD;
 }
 
@@ -26,7 +22,6 @@ list_t *Append(list_t *A, int pid, char *str) {
     strcpy(element->name, str);
     element->next = tmp; // добавляем узел из ------------------------------
 
-    // GLOBAL_LIST_LEN += 1;
     return element;
 }
 
@@ -38,8 +33,6 @@ list_t *Remove(list_t *A, list_t *head) {
     }   
     tmp->next = A->next;
     free(A);
-    // GLOBAL_LIST_LEN -= 1;
-
     return tmp;
 }
 
@@ -115,7 +108,6 @@ list_t *Search_Element_on_PID(list_t *H, int pid) {
         }
         a = GetTail(a);
     }
-    // printf("a: %s", a->name);
     return a;
 }
 
@@ -125,65 +117,4 @@ void Copy_Data_out_MSG_BUF(list_t *dest, struct my_msgbuf source) {
         strcpy(dest->name, source.mtext);
     }
 }
-
-
-// int main() {
-    // Тестирование функций
-
-    // list_t *head = Create();
-    // head->value = 1;
-    // Append(head, 2);
-    // Append(head, 3);    
-    // int len = Len_List(head);
-    // assert(len == 3);    
-
-    // list_t *tmp;
-    // assert(IsEmpty(tmp) == 1);
-
-    // list_t *A = head;
-    // A = GetTail(A);
-    // assert(A->value == 3);
-
-    // A = GetTail(A);
-    // assert(GetHead(A) == 2);
-
-    // Append(head, 4); // 1 4 3 2
-    // A = head;
-    // A = GetTail(A);
-    // A = Remove(A, head); // 1 3 2 
-    // A = GetTail(A);
-    // assert(A->value == 3);
-
-    
-    // A = GetTail(A); // 2
-    // A = Remove(A, head); // 1 3  
-    // A = Remove(A, head); // 1
-    // A = GetTail(A); // NULL
-    // assert(IsEmpty(A) == 1);
-
-    // // Search_Element
-    // A = head;
-    // Append(head, 2); // 1 2 
-    // A = A->next;
-    // Append(A, 3); // 1 2 3
-    // A = A->next;
-    // Append(A, 2); // 1 2 3 2
-    // A = A->next;
-    // Append(A, 1); // 1 2 3 2 1
-    // A = A->next; // 1
-    // assert(Search_Element(head, 1) == A);
-    // A = head;
-    // A = A->next;  // 2
-    // A = A->next;  // 3
-    // assert(Search_Element(head, 3) == A);
-
-    // // Polidrom
-    // assert(Check_Polindrom(head) == 1);
-    
-    // // DEL_DUPLICATE
-    // DelDuplic(head);    
-    // assert(Len_List(head) == 3);
-
-	// return 0;
-// }
 

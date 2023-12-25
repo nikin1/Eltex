@@ -51,8 +51,7 @@ typedef struct list {
 int get_msg(int qid, int msgtype, struct my_msgbuf* msg, int var_nowait);
 void errExit(char *str);
 void send_msg(int qid, int msgtype, char *str_to_msg);
-void send_msg_all_users(int qid, list_t *head_name_list, char *str_to_msg);
-
+void send_msg_all_users(int qid_2, list_t *head_name_list, char *str_to_msg, long pid, char *name, int right_status);
 
 
 
