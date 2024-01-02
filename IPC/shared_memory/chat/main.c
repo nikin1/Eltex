@@ -4,7 +4,7 @@ extern WINDOW *WIN_LEFT, *WIN_RIGHT, *WIN_LEFT_BORDER, *WIN_RIGHT_BORDER,
 *WIN_DOWN_BORDER, *WIN_DOWN, *WIN_INPUT;
 
 
-sem_t *sem_left, *sem_right;
+sem_t *sem;
 
 int main() {
 
@@ -56,10 +56,9 @@ int main() {
     }
 
 
-    sem_left = sem_open(path_for_sem, O_CREAT, mode, value);
-    sem_right = sem_open(path_for_sem, O_CREAT, mode, value);
+    sem = sem_open(path_for_sem, O_CREAT, mode, value);
 
-    if (sem_left == SEM_FAILED || sem_right == SEM_FAILED) {
+    if (sem == SEM_FAILED) {
         printf("FAIL_SEM\n");
 
         printf("error: %d\n", errno);
@@ -68,8 +67,7 @@ int main() {
     }
     
     
-    sem_post(sem_left); // sem = 1
-    sem_post(sem_right); // sem = 1
+    sem_post(sem); // sem = 1
 
 
 
@@ -90,16 +88,14 @@ int main() {
     input_message_on_display(name);
     wclear(WIN_INPUT);
 
-    sem_wait(sem_right);
+    sem_wait(sem);
     strcat(data_right, name);
     strcat(data_right, "\n");
 
     display_right(WIN_RIGHT, data_right);
 
-    sem_post(sem_right);
+    sem_post(sem);
     while (1) {
-        // wclear(WIN_LEFT);
-        // wclear(WIN_RIGHT);
 
         display_right(WIN_RIGHT, data_right);
         display_left(WIN_LEFT, data_left);
@@ -118,10 +114,10 @@ int main() {
 
 
         if (str_message[0] != '\0') {
-            sem_wait(sem_left);
+            sem_wait(sem);
             snprintf(full_msg, 128, "%s:%s\n", name, str_message);
             strcat(data_left, full_msg);
-            sem_post(sem_left);
+            sem_post(sem);
         }
         data_left[strlen(data_left)] = '\0';
         data_right[strlen(data_right)] = '\0';
@@ -153,9 +149,7 @@ int main() {
 
 
 
-    sem_close(sem_left);
-    sem_close(sem_right);
-
+    sem_close(sem);
     sem_unlink(path_for_sem);
 
     return 0;
