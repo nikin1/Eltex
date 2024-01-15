@@ -1,0 +1,12 @@
+Сигналы
+
+
+1.example_sigaction
+Просто учимся перенавправлять сигнал SIGUSR1
+
+Затем командой top you need to find this pid  
+И вводим команду kill -SIGUSR1 [pid]  
+ 
+2. Event loop
+При вводе команды kill -SIGUSR1 [pid], сигнал срабатывает и интерация цикла продолжает
+но мой handler уже не работает
